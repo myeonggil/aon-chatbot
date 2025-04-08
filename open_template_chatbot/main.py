@@ -9,6 +9,7 @@ from dotenv import dotenv_values
 
 import openai
 import asyncio
+import json
 
 app = FastAPI()
 config = dotenv_values("open_template_chatbot/.env")
@@ -16,10 +17,10 @@ client = AsyncGroq(api_key=config["GROQ_API_KEY"])
 
 
 class TestCreate(BaseModel):
-    query: str
+    prompt: str
 
 
-async def chat_with_gpt(prompt):
+async def groq_template(prompt: str):
     """
         You will be provided with text delimited by triple quotes.
         If it contains a sequence of instructions, \
@@ -53,20 +54,27 @@ async def chat_with_gpt(prompt):
         frequency_penalty=0,    # more lower use unique word
         presence_penalty=0  # more lower use similar and repeat word
     )
+
+    # chat mode
     async for chunk in response:
         message = chunk.choices[0].delta.content
-        yield message
         if message is None:
             break
+        data = f"data: {message} \n"
+        yield data.encode()
         await asyncio.sleep(0.01)
 
+    # finish chat
+    yield b'data: complete \n'
 
-@app.post("/test")
-async def test(test_create: TestCreate):
-    async for data in chat_with_gpt(test_create.query):
-        if data is None:
-            break
-        print(data, end='', flush=True)
+
+@app.post("/groq")
+async def chat_with_groq(test_create: TestCreate):
+    streaming_response = groq_template(test_create.prompt)
+    return StreamingResponse(
+        content=streaming_response,
+        media_type="text/event-stream"
+    )
 
 
 handler = Mangum(app)
