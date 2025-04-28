@@ -1,4 +1,4 @@
-hooks:
--   id: poetry-export
-    args: ["-f", "requirements.txt"]
-    verbose: true
+# hooks:
+# - id: poetry-export
+#   args: ["--platform", "manylinux2014_x86_64", "-f", "requirements.txt"]
+#   verbose: true

@@ -11,6 +11,8 @@ provider:
   logRetentionInDays: 3
   timeout: 30
   architecture: arm64
+  iam:
+    role: arn:aws:iam::021889793243:role/open-template-chatbot-dev-ap-northeast-2-lambdaRole
   # deploymentBucket:
   #   name: open-template-chatbot
   #   serverSideEncryption: AES256
@@ -51,7 +53,13 @@ functions:
         - "!yarn.lock"
         - "!package-lock.json"
         - "!package.json"
+        - "!poetry.lock"
+    url: true
     events:
-      - http:
-          method: post
-          path: /{proxy+}
+      - httpApi:
+          path: /groq
+          method: get
+    # events:
+    #   - http:
+    #       method: post
+    #       path: /{proxy+}
