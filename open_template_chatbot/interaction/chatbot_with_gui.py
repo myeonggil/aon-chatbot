@@ -3,20 +3,26 @@ from typing import AsyncGenerator
 
 import streamlit as st
 import asyncio
-import time
 
 
 def to_sync_generator(async_gen: AsyncGenerator):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
+        stream_text = ''
         while True:
             try:
                 task = anext(async_gen)
                 chunk = loop.run_until_complete(task)
+                stream_text += chunk
                 yield chunk
-            except StopAsyncIteration:
+            except StopAsyncIteration as _:
+                print("stopped chat iteration")
+                st.session_state.messages.append({"role": "assistant", "content": stream_text})
                 task.close()
+                break
+            except Exception as err:
+                print("Unknown", err)
                 break
     finally:
         loop.close()
@@ -51,4 +57,4 @@ if prompt := st.chat_input():
     # st.chat_message("assistant").write(msg)
     st.chat_message("assistant").write_stream(
         to_sync_generator(groq_template(prompt))
-    )
+    )   
