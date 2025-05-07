@@ -1,0 +1,9 @@
+.poetry/
+.serverless/
+.git/
+node_modules/
+
+*/.env
+.env
+config.yaml
+

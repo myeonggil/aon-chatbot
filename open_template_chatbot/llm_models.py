@@ -12,8 +12,7 @@ async def groq_template(prompt: str):
     """
         You will be provided with text delimited by triple quotes.
         If it contains a sequence of instructions, \
-        You have to finish the answer by providing number of max tokens.
-        It means that you don't have to answer next step, \
+        Summarize this in under 50 tokens: ..., \
         re-write those instructions in the following format:
         Step 1 - 
         Step 2 - ...
