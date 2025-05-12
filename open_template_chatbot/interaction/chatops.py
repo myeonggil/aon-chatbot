@@ -6,10 +6,15 @@ from abc import ABCMeta, abstractmethod
 from enum import StrEnum
 from dataclasses import dataclass
 from functools import partialmethod
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
-from slack_sdk.socket_mode.builtin import SocketModeClient
-from slack_sdk import WebClient
+from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
+from slack_bolt.context.say.async_say import AsyncSay
+from dotenv import dotenv_values
+
+import re
+import asyncio
+
+config = dotenv_values("open_template_chatbot/.env")
 
 
 class Ops(metaclass=ABCMeta):
@@ -33,9 +38,6 @@ class Ops(metaclass=ABCMeta):
     def alerts():
         pass
 
-
-app = App()
-@app.event()
 
 class AppMention(StrEnum):
     MESSAGE: str = "message"
@@ -63,9 +65,60 @@ class Message:
 
 @dataclass
 class Bot:
-    api: WebClient
-    client: SocketModeClient
+    # api: WebClient
+    # client: SocketModeClient
     default_handler: partialmethod
     reg: list[Register]
     ctx: any = None
     cancel: any = None
+
+
+app = AsyncApp(token=config["SLACK_BOT_TOKEN"])
+
+# Listens to incoming messages that contain "hello"
+@app.message(re.compile("hello"))
+async def message_hello(message: dict[str, any], say: AsyncSay):
+    # say() sends a message to the channel where the event was triggered
+    await say(
+        # blocks=[
+        #     {
+        #         "type": "section",
+        #         "text": {"type": "mrkdwn", "text": f"Hey there <@{message['user']}>!"},
+        #         "accessory": {
+        #             "type": "button",
+        #             "text": {"type": "plain_text", "text": "Click Me"},
+        #             "action_id": "button_click"
+        #         }
+        #     }
+        # ],
+        text=f"Hey there <@{message['user']}>!"
+    )
+
+# @app.event("app_mention")
+# async def who_am_i(event, client, message, say):
+#     print("called")
+
+# @app.action("button_click")
+# async def action_button_click(body, ack, say):
+#     # Acknowledge the action
+#     await ack()
+#     await say(f"<@{body['user']['id']}> clicked the button")
+
+
+async def main():
+    try:
+        socket_handler = AsyncSocketModeHandler(app=app, app_token=config["SLACK_APP_TOKEN"])
+        await socket_handler.start_async()
+    except Exception as err:
+        print(err)
+
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except Exception as err:
+        print(err)
+    except KeyboardInterrupt as err:
+        print(err)
+    finally:
+        pass
