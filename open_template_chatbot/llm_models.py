@@ -10,16 +10,16 @@ client = AsyncGroq(api_key=config["GROQ_API_KEY"])
 
 async def groq_template(prompt: str):
     """
+        You are helpful assistant. \n
         You will be provided with text delimited by triple quotes.
-        If it contains a sequence of instructions, \
-        Summarize this in under 50 tokens: ..., \
+        If it contains a sequence of instructions, \n
         re-write those instructions in the following format:
         Step 1 - 
         Step 2 - ...
 
-        Step N - Output a
+        Step N - Output summarize
 
-        If the text dose not contain a sequence of instructions, \
+        If the text dose not contain a sequence of instructions, \n
         then simply write \"No steps provided.\"
 
         \"\"\"prompt\"\"\"
@@ -27,12 +27,16 @@ async def groq_template(prompt: str):
     response = await client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            # {
-            #     "role": "assistant",
-            # },
+            {
+                "role": "assistant",
+            },
             {
                 "role": "user",
                 "content": prompt
+            },
+            {
+                "role": "user",
+                "content": "Please summarize smaller than maximum tokens"
             }
         ],
         stream=True,
