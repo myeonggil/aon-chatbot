@@ -1,4 +1,4 @@
-from open_template_chatbot.llm_models import groq_template
+from open_template_chatbot.llm_models import groq_template_stream
 from typing import AsyncGenerator
 from yaml import SafeLoader
 
@@ -69,12 +69,11 @@ try:
             st.session_state.messages.append({"role": "user", "content": prompt})
             st.chat_message("user").write(prompt)
             # response = client.chat.completions.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
-            # response = await groq_template(prompt)
             # msg = response.choices[0].message.content
             # st.session_state.messages.append({"role": "assistant", "content": msg})
             # st.chat_message("assistant").write(msg)
             st.chat_message("assistant").write_stream(
-                to_sync_generator(groq_template(prompt))
+                to_sync_generator(groq_template_stream(prompt))
             )  
     elif st.session_state.get('authentication_status') is False:
         st.error('Username/password is incorrect')
