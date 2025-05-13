@@ -11,8 +11,11 @@ from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 from slack_bolt.context.say.async_say import AsyncSay
 from dotenv import dotenv_values
 
+from open_template_chatbot.llm_models import groq_template_response
+
 import re
 import asyncio
+import logging
 
 config = dotenv_values("open_template_chatbot/.env")
 
@@ -76,9 +79,11 @@ class Bot:
 app = AsyncApp(token=config["SLACK_BOT_TOKEN"])
 
 # Listens to incoming messages that contain "hello"
-@app.message(re.compile("hello"))
-async def message_hello(message: dict[str, any], say: AsyncSay):
+@app.message(re.compile("aon "))
+async def message_hello(message: dict[str, str | list[dict[str, any]]], say: AsyncSay):
     # say() sends a message to the channel where the event was triggered
+    _, prompt = message['text'].split('aon ')
+    response = await groq_template_response(prompt)
     await say(
         # blocks=[
         #     {
@@ -91,8 +96,13 @@ async def message_hello(message: dict[str, any], say: AsyncSay):
         #         }
         #     }
         # ],
-        text=f"Hey there <@{message['user']}>!"
+        # text=f"Hey there <@{message['user']}>!"
+        text=response
     )
+
+@app.event("message")
+async def handle_message_events(body, logger: logging.Logger):
+    logger.info(body)
 
 # @app.event("app_mention")
 # async def who_am_i(event, client, message, say):

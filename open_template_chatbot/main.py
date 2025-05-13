@@ -5,7 +5,7 @@ from groq import AsyncGroq
 from mangum import Mangum
 from pydantic import BaseModel
 from dotenv import dotenv_values
-from open_template_chatbot.llm_models import groq_template
+from open_template_chatbot.llm_models import groq_template_stream
 
 
 app = FastAPI()
@@ -19,7 +19,7 @@ class TestCreate(BaseModel):
 
 @app.get("/groq")
 async def chat_with_groq(prompt: str):
-    streaming_response = groq_template(prompt)
+    streaming_response = groq_template_stream(prompt)
     return StreamingResponse(
         content=streaming_response,
         media_type="text/event-stream"
