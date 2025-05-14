@@ -79,7 +79,7 @@ class Bot:
 app = AsyncApp(token=config["SLACK_BOT_TOKEN"])
 
 # Listens to incoming messages that contain "hello"
-@app.message(re.compile("aon "))
+@app.message("aon ")
 async def message_hello(message: dict[str, str | list[dict[str, any]]], say: AsyncSay):
     # say() sends a message to the channel where the event was triggered
     _, prompt = message['text'].split('aon ')
@@ -121,6 +121,8 @@ async def main():
         await socket_handler.start_async()
     except Exception as err:
         print(err)
+    finally:
+        await socket_handler.close_async()
 
 
 if __name__ == '__main__':
