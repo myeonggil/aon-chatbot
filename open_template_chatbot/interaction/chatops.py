@@ -13,7 +13,6 @@ from dotenv import dotenv_values
 
 from open_template_chatbot.llm_models import groq_template_response
 
-import re
 import asyncio
 import logging
 
