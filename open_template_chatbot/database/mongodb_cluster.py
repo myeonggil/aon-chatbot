@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import dotenv_values
+from open_template_chatbot.utils import get_embedding
+from open_template_chatbot.configs import env_config as config
 
-config = dotenv_values("open_template_chatbot/.env")
 # 비동기 클라이언트 설정
 MONGO_URI = config['MONGO_URI']
 USERNAME = config['USERNAME']
@@ -34,3 +34,36 @@ class MongoDBCluster:
         self.client = AsyncIOMotorClient(MONGO_URI)
         self.db = self.client['chatbot']
         self.collection = self.db['chat_history']
+
+    async def insert_chat(self, data: dict[str, ]):
+        pass
+
+    async def search_chat(self, data: str):
+        pass
+
+    async def _create_rag_documents(self, documents: list[dict[str, str | list]]):
+        _ = await self.collection.insert_many(documents=documents)
+
+    async def search_vector(self, query: str):
+        query_embedding = get_embedding(query)
+        pipeline = [
+            {
+                    "$vectorSearch": {
+                        "index": "vector_index",
+                        "queryVector": query_embedding,
+                        "path": "embedding",
+                        "exact": True,
+                        "limit": 5
+                    }
+            }, {
+                    "$project": {
+                    "_id": 0,
+                    "text": 1
+                }
+            }
+        ]
+        results = await self.collection.aggregate(pipeline=pipeline)
+        array_of_results = []
+        for doc in results:
+            array_of_results.append(doc)
+        return array_of_results
