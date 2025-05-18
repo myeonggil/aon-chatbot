@@ -9,14 +9,12 @@ from functools import partialmethod
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 from slack_bolt.context.say.async_say import AsyncSay
-from dotenv import dotenv_values
+from open_template_chatbot.configs import env_config as config
 
 from open_template_chatbot.llm_models import groq_template_response
 
 import asyncio
 import logging
-
-config = dotenv_values("open_template_chatbot/.env")
 
 
 class Ops(metaclass=ABCMeta):
