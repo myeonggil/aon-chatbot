@@ -4,7 +4,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents.base import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 # login()
 
 # Load the embedding model

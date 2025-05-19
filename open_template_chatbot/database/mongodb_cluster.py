@@ -1,4 +1,4 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 from open_template_chatbot.utils import get_embedding
 from open_template_chatbot.configs import env_config as config
 
@@ -31,9 +31,12 @@ class MongoDBCluster:
     """
 
     def __init__(self):
-        self.client = AsyncIOMotorClient(MONGO_URI)
+        self.client = AsyncMongoClient(MONGO_URI)
         self.db = self.client['chatbot']
         self.collection = self.db['chat_history']
+
+    async def close(self):
+        await self.client.close()
 
     async def insert_chat(self, data: dict[str, ]):
         pass
@@ -42,9 +45,15 @@ class MongoDBCluster:
         pass
 
     async def _create_rag_documents(self, documents: list[dict[str, str | list]]):
-        _ = await self.collection.insert_many(documents=documents)
+        result = await self.collection.insert_many(documents=documents)
+        return result
 
-    async def search_vector(self, query: str):
+    async def get_context_string_from_docs(self, query: str) -> str:
+        context_docs = await self._search_vector(query=query)
+        context_string = " ".join([doc["text"] for doc in context_docs])
+        return context_string
+
+    async def _search_vector(self, query: str):
         query_embedding = get_embedding(query)
         pipeline = [
             {
@@ -62,8 +71,7 @@ class MongoDBCluster:
                 }
             }
         ]
-        results = await self.collection.aggregate(pipeline=pipeline)
         array_of_results = []
-        for doc in results:
+        async for doc in await self.collection.aggregate(pipeline=pipeline):
             array_of_results.append(doc)
         return array_of_results

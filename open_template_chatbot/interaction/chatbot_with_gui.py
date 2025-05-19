@@ -1,4 +1,5 @@
 from open_template_chatbot.llm_models import groq_template_stream
+from asyncio import AbstractEventLoop
 from typing import AsyncGenerator
 from yaml import SafeLoader
 
@@ -6,11 +7,15 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import asyncio
 import yaml
+import torch
+
+# torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)] 
+
+# or simply:
+torch.classes.__path__ = []
 
 
-def to_sync_generator(async_gen: AsyncGenerator):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+def to_sync_generator(loop: AbstractEventLoop, async_gen: AsyncGenerator):
     try:
         stream_text = ''
         while True:
@@ -28,7 +33,7 @@ def to_sync_generator(async_gen: AsyncGenerator):
                 print("Unknown", err)
                 break
     finally:
-        loop.close()
+        pass
 
 
 # with st.sidebar:
@@ -48,6 +53,7 @@ authenticator = stauth.Authenticate(
 )
 
 try:
+    # init everything when login
     authenticator.login()
     if st.session_state.get('authentication_status'):
         authenticator.logout()
@@ -61,20 +67,15 @@ try:
             st.chat_message(msg["role"]).write(msg["content"])
 
         if prompt := st.chat_input():
-            # if not openai_api_key:
-            #     st.info("Please add your OpenAI API key to continue.")
-            #     st.stop()
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
 
-            # client = OpenAI(api_key=openai_api_key)
             st.session_state.messages.append({"role": "user", "content": prompt})
             st.chat_message("user").write(prompt)
-            # response = client.chat.completions.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
-            # msg = response.choices[0].message.content
-            # st.session_state.messages.append({"role": "assistant", "content": msg})
-            # st.chat_message("assistant").write(msg)
             st.chat_message("assistant").write_stream(
-                to_sync_generator(groq_template_stream(prompt))
-            )  
+                to_sync_generator(loop, groq_template_stream(prompt))
+            )
+            loop.close()
     elif st.session_state.get('authentication_status') is False:
         st.error('Username/password is incorrect')
     elif st.session_state.get('authentication_status') is None:

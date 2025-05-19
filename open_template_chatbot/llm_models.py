@@ -1,6 +1,7 @@
 # 간단한 langchain을 구현해보자
 from groq import AsyncGroq
 from dotenv import dotenv_values
+from open_template_chatbot.database.mongodb_cluster import MongoDBCluster
 
 import asyncio
 
@@ -8,7 +9,7 @@ config = dotenv_values("open_template_chatbot/.env")
 client = AsyncGroq(api_key=config["GROQ_API_KEY"])
 
 
-async def groq_template_stream(prompt: str):
+async def groq_template_stream(query: str):
     """
         You are helpful assistant. \n
         You will be provided with text delimited by triple quotes.
@@ -23,6 +24,12 @@ async def groq_template_stream(prompt: str):
         then simply write \"No steps provided.\"
 
         \"\"\"prompt\"\"\"
+    """
+    mongo_cluster = MongoDBCluster()
+    context_string = await mongo_cluster.get_context_string_from_docs(query=query)
+    prompt = f"""Use the following pieces of context to answer the question at the end.
+        {context_string}
+        Question: {query}
     """
     # Let's understand how to make chaining chat completion?
     # We can give question and answer to chat completion
@@ -62,6 +69,7 @@ async def groq_template_stream(prompt: str):
         if message is not None:
             yield message
         await asyncio.sleep(0.01)
+    await mongo_cluster.close()
 
 
 async def groq_template_response(prompt: str):
