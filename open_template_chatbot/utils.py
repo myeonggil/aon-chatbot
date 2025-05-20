@@ -1,20 +1,23 @@
-from huggingface_hub import login
-from sentence_transformers import SentenceTransformer
+
+# from sentence_transformers import SentenceTransformer
 # from langchain_community.document_loaders import PyPDFLoader
 # from langchain_core.documents.base import Document
 # from langchain.text_splitter import RecursiveCharacterTextSplitter
 from open_template_chatbot.configs import env_config as config
+from nomic import embed, login
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-login(token=config["HUGGINGFACE_TOKEN"])
+login(token=config["NOMIC_API_TOKEN"])
 
 # Load the embedding model
-model = SentenceTransformer("nomic-ai/nomic-embed-text-v1", trust_remote_code=True)
+# model = SentenceTransformer("nomic-ai/nomic-embed-text-v1", trust_remote_code=True)
 
 # Define a function to generate embeddings
-def get_embedding(data: str, precision="float32") -> list[float | int]:
-   return model.encode(data, precision=precision).tolist()
+def get_embedding(data: str, precision: str = "float32") -> list[float | int]:
+   # return model.encode(data, precision=precision).tolist()
+   response = embed.text([data])
+   return response['embeddings'][0]
 
 
 # def get_document_from_pdf():
