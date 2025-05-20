@@ -2,10 +2,10 @@
 from groq import AsyncGroq
 from dotenv import dotenv_values
 from open_template_chatbot.database.mongodb_cluster import MongoDBCluster
+from open_template_chatbot.configs import env_config as config
 
 import asyncio
 
-config = dotenv_values("open_template_chatbot/.env")
 client = AsyncGroq(api_key=config["GROQ_API_KEY"])
 
 
@@ -27,9 +27,12 @@ async def groq_template_stream(query: str):
     """
     mongo_cluster = MongoDBCluster()
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
-    prompt = f"""Use the following pieces of context to answer the question at the end.
+    prompt = f"""
+        You are helpful assistant.
+        You will be provided with text delimited by triple quotes.
+        Use the following pieces of context to answer the question at the end.
         {context_string}
-        Question: {query}
+        \"\"\"{query}\"\"\"
     """
     # Let's understand how to make chaining chat completion?
     # We can give question and answer to chat completion
@@ -72,7 +75,7 @@ async def groq_template_stream(query: str):
     await mongo_cluster.close()
 
 
-async def groq_template_response(prompt: str):
+async def groq_template_response(query: str):
     """
         You are helpful assistant. \n
         You will be provided with text delimited by triple quotes.
@@ -87,6 +90,15 @@ async def groq_template_response(prompt: str):
         then simply write \"No steps provided.\"
 
         \"\"\"prompt\"\"\"
+    """
+    mongo_cluster = MongoDBCluster()
+    context_string = await mongo_cluster.get_context_string_from_docs(query=query)
+    prompt = f"""
+        You are helpful assistant.
+        You will be provided with text delimited by triple quotes.
+        Use the following pieces of context to answer the question at the end.
+        {context_string}
+        \"\"\"{query}\"\"\"
     """
     # Let's understand how to make chaining chat completion?
     # We can give question and answer to chat completion
@@ -116,6 +128,7 @@ async def groq_template_response(prompt: str):
         presence_penalty=0  # more lower use similar and repeat word
     )
 
+    await mongo_cluster.close()
     if response.choices:
         return response.choices[0].message.content
     else:
