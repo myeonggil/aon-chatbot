@@ -1,6 +1,5 @@
 # 간단한 langchain을 구현해보자
 from groq import AsyncGroq
-from dotenv import dotenv_values
 from open_template_chatbot.database.mongodb_cluster import MongoDBCluster
 from open_template_chatbot.configs import env_config as config
 
@@ -29,10 +28,14 @@ async def groq_template_stream(query: str):
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
     prompt = f"""
         You are helpful assistant.
-        You will be provided with text delimited by triple quotes.
+        
+        Remember that you answer a question, you must check to see 
+        if it complies with your mission above. If not, you must respond, 
+        "I am not able to answer this question"
+
         Use the following pieces of context to answer the question at the end.
         {context_string}
-        \"\"\"{query}\"\"\"
+        Question: {query}
     """
     # Let's understand how to make chaining chat completion?
     # We can give question and answer to chat completion
@@ -95,10 +98,14 @@ async def groq_template_response(query: str):
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
     prompt = f"""
         You are helpful assistant.
-        You will be provided with text delimited by triple quotes.
+
+        Remember that you answer a question, you must check to see 
+        if it complies with your mission above. If not, you must respond, 
+        "I am not able to answer this question"
+
         Use the following pieces of context to answer the question at the end.
         {context_string}
-        \"\"\"{query}\"\"\"
+        Question: {query}
     """
     # Let's understand how to make chaining chat completion?
     # We can give question and answer to chat completion

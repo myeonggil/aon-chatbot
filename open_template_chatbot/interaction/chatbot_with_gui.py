@@ -7,12 +7,6 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import asyncio
 import yaml
-import torch
-
-# torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)] 
-
-# or simply:
-torch.classes.__path__ = []
 
 
 def to_sync_generator(loop: AbstractEventLoop, async_gen: AsyncGenerator):
