@@ -12,7 +12,7 @@ async def test_create_search_intex():
 @pytest.mark.asyncio(loop_scope='function')
 async def test_insert_docs():
     # mongo_cluster = MongoDBCluster()
-    # assert mongo_cluster.client.is_primary == True
+    # assert await mongo_cluster.client.is_primary == True
 
     # # How to verify?
     # documents = get_document_from_pdf()
@@ -24,4 +24,5 @@ async def test_insert_docs():
 
     # result = await mongo_cluster._create_rag_documents(documents=docs_to_insert)
     # assert len(result.inserted_ids) > 0
+    # await mongo_cluster.close()
     pass
