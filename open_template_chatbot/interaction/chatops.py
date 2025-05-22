@@ -2,10 +2,7 @@
 # telemetry apply
 # something API? I don't know well...
 # Go for DevOps.ref
-from abc import ABCMeta, abstractmethod
 from enum import StrEnum
-from dataclasses import dataclass
-from functools import partialmethod
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 from slack_bolt.context.say.async_say import AsyncSay
@@ -15,28 +12,6 @@ from open_template_chatbot.llm_models import groq_template_response
 
 import asyncio
 import logging
-
-
-class Ops(metaclass=ABCMeta):
-    @abstractmethod
-    def listen_traces():
-        pass
-
-    @abstractmethod
-    def show_trace():
-        pass
-
-    @abstractmethod
-    def change_sampling():
-        pass
-
-    @abstractmethod
-    def deployed_version():
-        pass
-
-    @abstractmethod
-    def alerts():
-        pass
 
 
 class AppMention(StrEnum):
@@ -50,27 +25,6 @@ class AppMention(StrEnum):
     CHANNEL_CREATED: str = "channel_created"
     CHANNEL_DELETED: str = "channel_deleted"
     FILE_SHARED: str = "file_shared"
-
-
-@dataclass
-class Register:
-    r: partialmethod
-    h: partialmethod
-
-@dataclass
-class Message:
-    user: str
-    app_mention: AppMention
-    text: str
-
-@dataclass
-class Bot:
-    # api: WebClient
-    # client: SocketModeClient
-    default_handler: partialmethod
-    reg: list[Register]
-    ctx: any = None
-    cancel: any = None
 
 
 app = AsyncApp(token=config["SLACK_BOT_TOKEN"])
