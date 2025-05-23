@@ -28,10 +28,10 @@ async def groq_template_stream(query: str):
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
     prompt = f"""
         You are helpful assistant.
-        
+
         Remember that you answer a question, you must check to see 
         if it complies with your mission above. If not, you must respond, 
-        "I am not able to answer this question"
+        "I am not able to answer this question". But, you must translate to Korean
 
         Use the following pieces of context to answer the question at the end.
         {context_string}
@@ -44,6 +44,9 @@ async def groq_template_stream(query: str):
     response = await client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
+            {
+                "role": "system", "content": "Keep all responses under 512 tokens."
+            },
             # {
             #     "role": "assistant",
             # },
@@ -51,10 +54,10 @@ async def groq_template_stream(query: str):
                 "role": "user",
                 "content": prompt
             },
-            {
-                "role": "user",
-                "content": "Please summarize smaller than maximum tokens"
-            }
+            # {
+            #     "role": "user",
+            #     "content": "Please answer smaller than 512 tokens"
+            # }
         ],
         stream=True,
         timeout=5,
@@ -101,7 +104,7 @@ async def groq_template_response(query: str):
 
         Remember that you answer a question, you must check to see 
         if it complies with your mission above. If not, you must respond, 
-        "I am not able to answer this question"
+        "I am not able to answer this question". But, you must translate to Korean
 
         Use the following pieces of context to answer the question at the end.
         {context_string}
@@ -114,6 +117,9 @@ async def groq_template_response(query: str):
     response = await client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
+            {
+                "role": "system", "content": "Keep all responses under 512 tokens."
+            },
             # {
             #     "role": "assistant",
             # },
@@ -121,10 +127,10 @@ async def groq_template_response(query: str):
                 "role": "user",
                 "content": prompt
             },
-            {
-                "role": "user",
-                "content": "Please summarize smaller than maximum tokens"
-            }
+            # {
+            #     "role": "user",
+            #     "content": "Please answer smaller than 512 tokens"
+            # }
         ],
         stream=False,
         timeout=5,
