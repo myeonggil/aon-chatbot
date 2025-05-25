@@ -9,21 +9,6 @@ client = AsyncGroq(api_key=config["GROQ_API_KEY"])
 
 
 async def groq_template_stream(query: str):
-    """
-        You are helpful assistant. \n
-        You will be provided with text delimited by triple quotes.
-        If it contains a sequence of instructions, \n
-        re-write those instructions in the following format:
-        Step 1 - 
-        Step 2 - ...
-
-        Step N - Output summarize
-
-        If the text dose not contain a sequence of instructions, \n
-        then simply write \"No steps provided.\"
-
-        \"\"\"prompt\"\"\"
-    """
     mongo_cluster = MongoDBCluster()
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
     prompt = f"""
@@ -45,7 +30,8 @@ async def groq_template_stream(query: str):
         model="llama-3.3-70b-versatile",
         messages=[
             {
-                "role": "system", "content": "Keep all responses under 512 tokens."
+                "role": "system",
+                "content": "Keep all responses under 512 tokens."
             },
             # {
             #     "role": "assistant",
@@ -82,21 +68,6 @@ async def groq_template_stream(query: str):
 
 
 async def groq_template_response(query: str):
-    """
-        You are helpful assistant. \n
-        You will be provided with text delimited by triple quotes.
-        If it contains a sequence of instructions, \n
-        re-write those instructions in the following format:
-        Step 1 - 
-        Step 2 - ...
-
-        Step N - Output summarize
-
-        If the text dose not contain a sequence of instructions, \n
-        then simply write \"No steps provided.\"
-
-        \"\"\"prompt\"\"\"
-    """
     mongo_cluster = MongoDBCluster()
     context_string = await mongo_cluster.get_context_string_from_docs(query=query)
     prompt = f"""
@@ -118,7 +89,8 @@ async def groq_template_response(query: str):
         model="llama-3.3-70b-versatile",
         messages=[
             {
-                "role": "system", "content": "Keep all responses under 512 tokens."
+                "role": "system",
+                "content": "Keep all responses under 512 tokens."
             },
             # {
             #     "role": "assistant",
