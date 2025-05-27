@@ -10,7 +10,7 @@ from open_template_chatbot.configs import env_config as config
 
 from open_template_chatbot.llm_models import groq_template_response
 
-import asyncio
+# import asyncio
 import logging
 
 
@@ -76,12 +76,12 @@ async def main():
         await socket_handler.close_async()
 
 
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except Exception as err:
-        print(err)
-    except KeyboardInterrupt as err:
-        print(err)
-    finally:
-        pass
+# if __name__ == '__main__':
+#     try:
+#         asyncio.run(main())
+#     except Exception as err:
+#         print(err)
+#     except KeyboardInterrupt as err:
+#         print(err)
+#     finally:
+#         pass
