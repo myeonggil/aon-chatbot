@@ -36,45 +36,46 @@ def to_sync_generator(loop: AbstractEventLoop, async_gen: AsyncGenerator):
 #     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
 #     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
 
-with open("./config.yaml") as file:
-    config = yaml.load(file, Loader=SafeLoader)
+def run_streamlit():
+    with open("./config.yaml") as file:
+        config = yaml.load(file, Loader=SafeLoader)
 
-authenticator = stauth.Authenticate(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days']
-)
+    authenticator = stauth.Authenticate(
+        config['credentials'],
+        config['cookie']['name'],
+        config['cookie']['key'],
+        config['cookie']['expiry_days']
+    )
 
-try:
-    # init everything when login
-    authenticator.login()
-    if st.session_state.get('authentication_status'):
-        authenticator.logout()
-        st.write(f'Welcome *{st.session_state.get("name")}*')
-        st.title("💬 Chatbot")
-        st.caption("🚀 A Streamlit chatbot powered by OpenAI")
-        if "messages" not in st.session_state:
-            st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+    try:
+        # init everything when login
+        authenticator.login()
+        if st.session_state.get('authentication_status'):
+            authenticator.logout()
+            st.write(f'Welcome *{st.session_state.get("name")}*')
+            st.title("💬 Chatbot")
+            st.caption("🚀 A Streamlit chatbot powered by OpenAI")
+            if "messages" not in st.session_state:
+                st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
-        for msg in st.session_state.messages:
-            st.chat_message(msg["role"]).write(msg["content"])
+            for msg in st.session_state.messages:
+                st.chat_message(msg["role"]).write(msg["content"])
 
-        if prompt := st.chat_input():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            if prompt := st.chat_input():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
 
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.chat_message("user").write(prompt)
-            st.chat_message("assistant").write_stream(
-                to_sync_generator(loop, groq_template_stream(prompt))
-            )
-            loop.close()
-    elif st.session_state.get('authentication_status') is False:
-        st.error('Username/password is incorrect')
-    elif st.session_state.get('authentication_status') is None:
-        st.warning('Please enter your username and password')
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                st.chat_message("user").write(prompt)
+                st.chat_message("assistant").write_stream(
+                    to_sync_generator(loop, groq_template_stream(prompt))
+                )
+                loop.close()
+        elif st.session_state.get('authentication_status') is False:
+            st.error('Username/password is incorrect')
+        elif st.session_state.get('authentication_status') is None:
+            st.warning('Please enter your username and password')
 
-except Exception as e:
-    print(e)
-    st.error(e)
+    except Exception as e:
+        print(e)
+        st.error(e)
