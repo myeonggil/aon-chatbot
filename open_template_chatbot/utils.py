@@ -7,6 +7,7 @@ from open_template_chatbot.configs import env_config as config
 from nomic import embed, login
 
 import os
+import tomllib
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 login(token=config["NOMIC_API_TOKEN"])
 
@@ -40,3 +41,20 @@ def make_docs_data(documents: list[Document]) -> list[dict[str, list | str]]:
    # } for doc in documents]
    # return docs_to_insert
    pass
+
+
+def update_streamlit_config(
+   browser_gatherUsageStats: str,
+   server_headless: str,
+   server_enableXsrfProtection: str,
+   server_enableCORS: str,
+   server_address: str,
+   server_port: str,
+):
+   if not os.path.isdir("./.streamlit"):
+      os.mkdir('./.streamlit')
+   if not os.path.isfile('./.streamlit/config.toml'):
+      with open('./.streamlit.default/config.toml', 'rb') as f:
+         config = tomllib.load(f)
+         print(config)
+         
