@@ -36,6 +36,7 @@ dependencies = [
     "langchain (>=0.3.25,<0.4.0)",
     "langchain-community (>=0.3.24,<0.4.0)",
     "typer (>=0.16.0,<0.17.0)",
+    "toml (>=0.10.2,<0.11.0)",
 ]
 
 

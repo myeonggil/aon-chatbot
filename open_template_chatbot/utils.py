@@ -1,60 +1,33 @@
 
-# from sentence_transformers import SentenceTransformer
-# from langchain_community.document_loaders import PyPDFLoader
-from langchain_core.documents.base import Document
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-from open_template_chatbot.configs import env_config as config
-from nomic import embed, login
-
 import os
-import tomllib
+import toml
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-login(token=config["NOMIC_API_TOKEN"])
 
 # Load the embedding model
+# from sentence_transformers import SentenceTransformer
+# from langchain_community.document_loaders import PyPDFLoader
 # model = SentenceTransformer("nomic-ai/nomic-embed-text-v1", trust_remote_code=True)
-
-# Define a function to generate embeddings
-def get_embedding(data: str, precision: str = "float32") -> list[float | int]:
-   # return model.encode(data, precision=precision).tolist()
-   response = embed.text([data])
-   return response['embeddings'][0]
-
-
-def get_document_from_pdf():
-    # Load the PDF
-    # AWS cloud
-   # loader = PyPDFLoader("https://docs.aws.amazon.com/ko_kr/whitepapers/latest/aws-overview/aws-overview.pdf")
-   # loader = PyPDFLoader("https://docs.aws.amazon.com/ko_kr/prescriptive-guidance/latest/getting-started-terraform/getting-started-terraform.pdf")
-   # data = loader.load()
-   # # Split the data into chunks
-   # text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=20)
-   # documents = text_splitter.split_documents(data)
-   # return documents
-   pass
-
-
-def make_docs_data(documents: list[Document]) -> list[dict[str, list | str]]:
-   # docs_to_insert = [{
-   #    "text": doc.page_content,
-   #    "embedding": get_embedding(doc.page_content)
-   # } for doc in documents]
-   # return docs_to_insert
-   pass
 
 
 def update_streamlit_config(
-   browser_gatherUsageStats: str,
-   server_headless: str,
-   server_enableXsrfProtection: str,
-   server_enableCORS: str,
-   server_address: str,
-   server_port: str,
+    browser_gatherUsageStats: bool,
+    server_headless: bool,
+    server_enableXsrfProtection: bool,
+    server_enableCORS: bool,
+    server_address: str,
+    server_port: int,
 ):
-   if not os.path.isdir("./.streamlit"):
-      os.mkdir('./.streamlit')
-   if not os.path.isfile('./.streamlit/config.toml'):
-      with open('./.streamlit.default/config.toml', 'rb') as f:
-         config = tomllib.load(f)
-         print(config)
-         
+    if not os.path.isdir("./.streamlit"):
+        os.mkdir('./.streamlit')
+    with open('./.streamlit.default/config.toml', 'rb') as f:
+        config = toml.loads(f.read().decode())
+        config['browser']['gatherUsageStats'] = browser_gatherUsageStats
+        config['server'] = {
+            'headless': server_headless,
+            'enableXsrfProtection': server_enableXsrfProtection,
+            'enableCORS': server_enableCORS,
+            'address': server_address,
+            'port': server_port
+        }
+    with open('./.streamlit/config.toml', 'w') as f:
+        _ = toml.dump(config, f)

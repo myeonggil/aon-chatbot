@@ -1,7 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
+
+from pymongo import AsyncMongoClient
 
 
-class ILLMRepository(meta=ABCMeta):
+class ILLMRepository(ABC):
 
     """
         How to create variable code.
@@ -9,9 +11,29 @@ class ILLMRepository(meta=ABCMeta):
     """
 
     @abstractmethod
-    async def insert_pdf_docs(self, docs: list[dict[str, str]]):
+    async def close(self) -> None:
         raise NotImplementedError()
 
     @abstractmethod
-    async def search_vector_index(self):
+    async def get_motor_client(self, client: AsyncMongoClient) -> None:
+        raise NotADirectoryError()
+
+    @abstractmethod
+    async def insert_chat(self, data: dict[str, any]) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def search_chat(self, data: str) -> str:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def create_rag_documents(self, documents: list[dict[str, str | list]]) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_context_string_from_docs(self, embedded_query: str) -> str:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def search_vector(self, embedded_query: str) -> list[str]:
         raise NotImplementedError()

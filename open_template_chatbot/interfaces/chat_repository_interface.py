@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class IChatRepository(meta=ABCMeta):
+class IChatRepository(ABC):
 
     """
         How to create variable code.
