@@ -1,6 +1,6 @@
 from pymongo import AsyncMongoClient
 
-from open_template_chatbot.database.mongodb_cluster import AsyncMongoClient, MONGO_URI
+from open_template_chatbot.database.mongodb_cluster import get_motor_client
 from open_template_chatbot.interfaces.chat_repository_interface import IChatRepository
 from open_template_chatbot.interfaces.llm_repository_interface import ILLMRepository
 
@@ -15,8 +15,8 @@ class LLMRepository(ILLMRepository):
     async def close(self):
         await self.client.close()
 
-    async def get_motor_client(self, mongo_client: AsyncMongoClient):
-        self.__init__(mongo_client)
+    async def set_motor_client(self):
+        self.__init__(get_motor_client())
 
     async def insert_chat(self, data: dict[str, any]):
         pass
@@ -56,4 +56,4 @@ class LLMRepository(ILLMRepository):
         return array_of_results
 
 
-llm_repository = LLMRepository(client=AsyncMongoClient(MONGO_URI))
+llm_repository = LLMRepository(client=get_motor_client())

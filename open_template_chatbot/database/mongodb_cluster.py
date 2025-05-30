@@ -10,3 +10,6 @@ MONGO_URI = MONGO_URI.replace(
 ).replace(
     '<password>', PASSWORD
 )
+
+def get_motor_client():
+    return AsyncMongoClient(MONGO_URI)

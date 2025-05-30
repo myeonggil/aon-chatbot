@@ -15,7 +15,7 @@ class ILLMRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_motor_client(self, client: AsyncMongoClient) -> None:
+    async def set_motor_client(self) -> None:
         raise NotADirectoryError()
 
     @abstractmethod

@@ -45,7 +45,7 @@ class LLMService:
         return response['embeddings'][0]
 
     async def groq_template_stream(self, query: str):
-        await self.llm_repository.get_motor_client(AsyncMongoClient(MONGO_URI))
+        await self.llm_repository.set_motor_client()
         embedded_query = self._get_embedding(query)
         context_string = await self.llm_repository.get_context_string_from_docs(
             embedded_query=embedded_query
