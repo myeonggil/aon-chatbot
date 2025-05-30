@@ -178,3 +178,5 @@ vendor/
 .serverless/
 */.env
 config.yaml
+.streamlit
+.poetry
