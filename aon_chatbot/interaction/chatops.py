@@ -8,7 +8,7 @@ from typing import Callable
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 from slack_bolt.context.say.async_say import AsyncSay
-from open_template_chatbot.configs import env_config as config
+from aon_chatbot.configs import config
 
 # import asyncio
 import logging

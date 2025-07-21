@@ -1,16 +1,19 @@
 import os
 import asyncio
 
+from typing import AsyncGenerator
+
 from groq import AsyncGroq
 from nomic import embed, login
+
 from langchain_core.documents.base import Document
 
-from open_template_chatbot.database.mongodb_cluster import AsyncMongoClient, MONGO_URI
-from open_template_chatbot.interfaces.llm_repository_interface import ILLMRepository
-from open_template_chatbot.interaction.chatbot_with_gui import ChatbotWithGUI
-from open_template_chatbot.interaction.chatops import ChatOps
-from open_template_chatbot.repository import llm_repository
-from open_template_chatbot.configs import env_config as config
+from aon_chatbot.database.mongodb_cluster import get_motor_client
+from aon_chatbot.interfaces.llm_repository_interface import ILLMRepository
+from aon_chatbot.interaction.chatbot_with_gui import ChatbotWithGUI
+from aon_chatbot.interaction.chatops import ChatOps
+from aon_chatbot.repository import llm_repository
+from aon_chatbot.configs import config
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 login(token=config["NOMIC_API_TOKEN"])
 
@@ -45,7 +48,8 @@ class LLMService:
         return response['embeddings'][0]
 
     async def groq_template_stream(self, query: str):
-        await self.llm_repository.set_motor_client()
+        client = get_motor_client()
+        await self.llm_repository.set_motor_client(client=client)
         embedded_query = self._get_embedding(query)
         context_string = await self.llm_repository.get_context_string_from_docs(
             embedded_query=embedded_query

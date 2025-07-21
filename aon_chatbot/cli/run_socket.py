@@ -1,8 +1,8 @@
 import typer
 import asyncio
 
-from open_template_chatbot.services import llm_service
-from open_template_chatbot.interaction.chatops import chatops
+from aon_chatbot.services import llm_service
+from aon_chatbot.interaction.chatops import chatops
 
 
 socket_app = typer.Typer(name='slack')

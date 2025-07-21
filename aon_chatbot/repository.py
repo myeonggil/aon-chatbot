@@ -1,22 +1,27 @@
 from pymongo import AsyncMongoClient
 
-from open_template_chatbot.database.mongodb_cluster import get_motor_client
-from open_template_chatbot.interfaces.chat_repository_interface import IChatRepository
-from open_template_chatbot.interfaces.llm_repository_interface import ILLMRepository
+from aon_chatbot.interfaces.chat_repository_interface import IChatRepository
+from aon_chatbot.interfaces.llm_repository_interface import ILLMRepository
 
 
 class LLMRepository(ILLMRepository):
 
-    def __init__(self, client: AsyncMongoClient):
+    def __init__(self):
+        self.client = None
+        self.db = None
+        self.collection = None
+
+    async def close(self):
+        if self.client:
+            await self.client.close()
+            self.client = None
+            self.db = None
+            self.collection = None
+
+    async def set_motor_client(self, client: AsyncMongoClient):
         self.client = client
         self.db = self.client['chatbot']
         self.collection = self.db['chat_history']
-
-    async def close(self):
-        await self.client.close()
-
-    async def set_motor_client(self):
-        self.__init__(get_motor_client())
 
     async def insert_chat(self, data: dict[str, any]):
         pass
@@ -36,15 +41,16 @@ class LLMRepository(ILLMRepository):
     async def search_vector(self, embedded_query: str):
         pipeline = [
             {
-                    "$vectorSearch": {
-                        "index": "vector_index",
-                        "queryVector": embedded_query,
-                        "path": "embedding",
-                        "exact": True,
-                        "limit": 5
-                    }
-            }, {
-                    "$project": {
+                "$vectorSearch": {
+                    "index": "vector_index",
+                    "queryVector": embedded_query,
+                    "path": "embedding",
+                    "exact": True,
+                    "limit": 5
+                }
+            },
+            {
+                "$project": {
                     "_id": 0,
                     "text": 1
                 }
@@ -56,4 +62,4 @@ class LLMRepository(ILLMRepository):
         return array_of_results
 
 
-llm_repository = LLMRepository(client=get_motor_client())
+llm_repository = LLMRepository()

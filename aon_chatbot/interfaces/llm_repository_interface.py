@@ -15,8 +15,8 @@ class ILLMRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set_motor_client(self) -> None:
-        raise NotADirectoryError()
+    async def set_motor_client(self, client: AsyncMongoClient) -> None:
+        raise NotImplementedError()
 
     @abstractmethod
     async def insert_chat(self, data: dict[str, any]) -> None:
