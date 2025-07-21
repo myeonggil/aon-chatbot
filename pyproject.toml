@@ -1,5 +1,5 @@
 [project]
-name = "open-template-chatbot"
+name = "aon-chatbot"
 version = "0.1.0"
 description = ""
 authors = [
@@ -51,4 +51,4 @@ poetry-plugin-export = ">=1.8"
 asyncio_default_fixture_loop_scope="function"
 
 [project.scripts]
-aon = "open_template_chatbot.cli.aon_command:app"
+aon = "aon_chatbot.cli.aon_command:app"

@@ -43,3 +43,6 @@ aon streamlit run
 # run slack socket mode
 aon slack run
 ```
+
+## How to extend this project?
+- with aon-a2a project

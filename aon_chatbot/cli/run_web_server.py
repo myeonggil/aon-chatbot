@@ -1,7 +1,7 @@
 import typer
 import subprocess
 
-from open_template_chatbot.utils import update_streamlit_config
+from aon_chatbot.utils import update_streamlit_config
 
 
 web_server_app = typer.Typer(name='streamlit')
@@ -22,5 +22,5 @@ def startup_gui(
         server_address=server_address,
         server_port=server_port
     )
-    run_command = ["streamlit", "run", "open_template_chatbot/main.py"]
+    run_command = ["streamlit", "run", "aon_chatbot/main.py"]
     subprocess.run(run_command)
