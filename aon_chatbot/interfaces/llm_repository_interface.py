@@ -37,3 +37,11 @@ class ILLMRepository(ABC):
     @abstractmethod
     async def search_vector(self, embedded_query: str) -> list[str]:
         raise NotImplementedError()
+
+    @abstractmethod
+    async def search_multi(self, vectors: list[list[float]], min_score: float) -> list[str]:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_context_string_from_multi(self, vectors: list[list[float]]) -> str:
+        raise NotImplementedError()
